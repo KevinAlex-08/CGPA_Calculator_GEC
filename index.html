@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .calculator-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .semester-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .semester-input {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .semester-input:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .semester-input label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .credit-info {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .semester-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .semester-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .result .cgpa-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .conversion-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .conversion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .conversion-input {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .conversion-input label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .conversion-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        select {
+            background-color: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .conversion-result {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .formula-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 CGPA Calculator</h1>
+        <p class="subtitle">Calculate your Cumulative Grade Point Average</p>
+
+        <div class="calculator-section">
+            <h2 class="section-title">Select Your Branch</h2>
+            
+            <div class="semester-grid" style="margin-bottom: 30px;">
+                <div class="semester-input" style="grid-column: 1 / -1;">
+                    <label for="branch">Choose Branch</label>
+                    <select id="branch" onchange="updateCredits()" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; cursor: pointer;">
+                        <option value="">-- Select Branch --</option>
+                        <option value="etc">ETC (Electronics and Telecommunication)</option>
+                        <option value="vlsi">VLSI (Very Large Scale Integration)</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="section-title">Enter SGPA for Each Semester</h2>
+            
+            <div class="semester-grid">
+                <div class="semester-input">
+                    <label for="sem1">Semester 1</label>
+                    <div class="credit-info" id="credit1">Credits: -</div>
+                    <input type="number" id="sem1" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input">
+                    <label for="sem2">Semester 2</label>
+                    <div class="credit-info" id="credit2">Credits: -</div>
+                    <input type="number" id="sem2" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input">
+                    <label for="sem3">Semester 3</label>
+                    <div class="credit-info" id="credit3">Credits: -</div>
+                    <input type="number" id="sem3" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input">
+                    <label for="sem4">Semester 4</label>
+                    <div class="credit-info" id="credit4">Credits: -</div>
+                    <input type="number" id="sem4" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input">
+                    <label for="sem5">Semester 5</label>
+                    <div class="credit-info" id="credit5">Credits: -</div>
+                    <input type="number" id="sem5" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input">
+                    <label for="sem6">Semester 6</label>
+                    <div class="credit-info" id="credit6">Credits: -</div>
+                    <input type="number" id="sem6" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculateCGPA()">Calculate CGPA</button>
+            <div class="error" id="cgpaError"></div>
+
+            <div class="result" id="result">
+                <h2>Your CGPA</h2>
+                <div class="cgpa-value" id="cgpaValue">0.00</div>
+                <p>Equivalent Percentage: <span id="percentageValue">0.00%</span></p>
+            </div>
+        </div>
+
+        <div class="conversion-section">
+            <h2 class="section-title">CGPA ⟷ Percentage Converter</h2>
+            
+            <div class="conversion-grid">
+                <div class="conversion-input">
+                    <label for="cgpaInput">CGPA to Percentage</label>
+                    <input type="number" id="cgpaInput" step="0.01" min="0" max="10" placeholder="Enter CGPA" oninput="convertCGPAToPercentage()">
+                    <div class="conversion-result" id="cgpaToPercent">-</div>
+                </div>
+
+                <div class="conversion-input">
+                    <label for="percentInput">Percentage to CGPA</label>
+                    <input type="number" id="percentInput" step="0.01" min="0" max="100" placeholder="Enter Percentage" oninput="convertPercentageToCGPA()">
+                    <div class="conversion-result" id="percentToCGPA">-</div>
+                </div>
+            </div>
+
+            <div class="formula-note">
+                <strong>Formulas Used:</strong><br>
+                • Percentage = (CGPA - 0.75) × 10<br>
+                • CGPA = (Percentage / 10) + 0.75
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Semester credits for different branches
+        const branchCredits = {
+            etc: {
+                sem1: 16,
+                sem2: 18,
+                sem3: 23,
+                sem4: 24,
+                sem5: 22,
+                sem6: 22
+            },
+            vlsi: {
+                sem1: 16,
+                sem2: 18,
+                sem3: 23,
+                sem4: 24,
+                sem5: 22,
+                sem6: 24
+            }
+        };
+
+        let currentCredits = {};
+
+        function updateCredits() {
+            const branch = document.getElementById('branch').value;
+            
+            if (!branch) {
+                // Clear credits if no branch selected
+                for (let i = 1; i <= 6; i++) {
+                    document.getElementById(`credit${i}`).textContent = 'Credits: -';
+                }
+                currentCredits = {};
+                return;
+            }
+
+            // Update credits based on selected branch
+            currentCredits = branchCredits[branch];
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`credit${i}`).textContent = `Credits: ${currentCredits[`sem${i}`]}`;
+            }
+        }
+
+        function calculateCGPA() {
+            const errorDiv = document.getElementById('cgpaError');
+            errorDiv.classList.remove('show');
+            
+            // Check if branch is selected
+            const branch = document.getElementById('branch').value;
+            if (!branch) {
+                errorDiv.textContent = 'Please select a branch first';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            // Get SGPA values
+            const sgpa = {
+                sem1: parseFloat(document.getElementById('sem1').value),
+                sem2: parseFloat(document.getElementById('sem2').value),
+                sem3: parseFloat(document.getElementById('sem3').value),
+                sem4: parseFloat(document.getElementById('sem4').value),
+                sem5: parseFloat(document.getElementById('sem5').value),
+                sem6: parseFloat(document.getElementById('sem6').value)
+            };
+
+            // Validation
+            const enteredSemesters = [];
+            for (let sem in sgpa) {
+                if (!isNaN(sgpa[sem]) && sgpa[sem] !== '') {
+                    if (sgpa[sem] < 0 || sgpa[sem] > 10) {
+                        errorDiv.textContent = 'SGPA values must be between 0 and 10';
+                        errorDiv.classList.add('show');
+                        return;
+                    }
+                    enteredSemesters.push(sem);
+                }
+            }
+
+            if (enteredSemesters.length === 0) {
+                errorDiv.textContent = 'Please enter at least one semester SGPA';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            // Calculate CGPA using the formula
+            // CGPA = (Total credits of Sem 1 * SGPA of Sem 1 + ... + Total credits of Sem n * SGPA of Sem n) / (Total credits of Sem 1 + ... + Total credits of Sem n)
+            
+            let numerator = 0;
+            let denominator = 0;
+
+            for (let sem of enteredSemesters) {
+                numerator += currentCredits[sem] * sgpa[sem];
+                denominator += currentCredits[sem];
+            }
+
+            const cgpa = numerator / denominator;
+
+            // Calculate percentage using the formula: Percentage = (CGPA - 0.75) * 10
+            const percentage = (cgpa - 0.75) * 10;
+
+            // Display results
+            document.getElementById('cgpaValue').textContent = cgpa.toFixed(2);
+            document.getElementById('percentageValue').textContent = percentage.toFixed(2) + '%';
+            document.getElementById('result').classList.add('show');
+        }
+
+        function convertCGPAToPercentage() {
+            const cgpa = parseFloat(document.getElementById('cgpaInput').value);
+            const resultDiv = document.getElementById('cgpaToPercent');
+            
+            if (isNaN(cgpa) || cgpa === '') {
+                resultDiv.textContent = '-';
+                return;
+            }
+
+            if (cgpa < 0 || cgpa > 10) {
+                resultDiv.textContent = 'Invalid CGPA (0-10)';
+                resultDiv.style.color = '#dc3545';
+                return;
+            }
+
+            // Formula: Percentage = (CGPA - 0.75) * 10
+            const percentage = (cgpa - 0.75) * 10;
+            resultDiv.textContent = percentage.toFixed(2) + '%';
+            resultDiv.style.color = '#667eea';
+        }
+
+        function convertPercentageToCGPA() {
+            const percentage = parseFloat(document.getElementById('percentInput').value);
+            const resultDiv = document.getElementById('percentToCGPA');
+            
+            if (isNaN(percentage) || percentage === '') {
+                resultDiv.textContent = '-';
+                return;
+            }
+
+            if (percentage < 0 || percentage > 100) {
+                resultDiv.textContent = 'Invalid Percentage (0-100)';
+                resultDiv.style.color = '#dc3545';
+                return;
+            }
+
+            // Formula: CGPA = (Percentage / 10) + 0.75
+            const cgpa = (percentage / 10) + 0.75;
+            resultDiv.textContent = cgpa.toFixed(2);
+            resultDiv.style.color = '#667eea';
+        }
+    </script>
+</body>
+</html>
