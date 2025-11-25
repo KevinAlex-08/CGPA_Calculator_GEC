@@ -247,12 +247,27 @@
             <h2 class="section-title">Select Your Branch</h2>
             
             <div class="semester-grid" style="margin-bottom: 30px;">
-                <div class="semester-input" style="grid-column: 1 / -1;">
+                <div class="semester-input">
                     <label for="branch">Choose Branch</label>
                     <select id="branch" onchange="updateCredits()" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; cursor: pointer;">
                         <option value="">-- Select Branch --</option>
                         <option value="etc">ETC (Electronics and Telecommunication)</option>
                         <option value="vlsi">VLSI (Very Large Scale Integration)</option>
+                    </select>
+                </div>
+                
+                <div class="semester-input">
+                    <label for="currentSem">Current Semester</label>
+                    <select id="currentSem" onchange="updateVisibleSemesters()" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; cursor: pointer;">
+                        <option value="">-- Select Current Semester --</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
                     </select>
                 </div>
             </div>
@@ -294,6 +309,18 @@
                     <label for="sem6">Semester 6</label>
                     <div class="credit-info" id="credit6">Credits: -</div>
                     <input type="number" id="sem6" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input" id="sem7-container" style="display: none;">
+                    <label for="sem7">Semester 7</label>
+                    <div class="credit-info" id="credit7">Credits: -</div>
+                    <input type="number" id="sem7" step="0.01" min="0" max="10" placeholder="Enter SGPA">
+                </div>
+
+                <div class="semester-input" id="sem8-container" style="display: none;">
+                    <label for="sem8">Semester 8</label>
+                    <div class="credit-info" id="credit8">Credits: -</div>
+                    <input type="number" id="sem8" step="0.01" min="0" max="10" placeholder="Enter SGPA">
                 </div>
             </div>
 
@@ -341,7 +368,9 @@
                 sem3: 23,
                 sem4: 24,
                 sem5: 22,
-                sem6: 22
+                sem6: 22,
+                sem7: 17,
+                sem8: 18
             },
             vlsi: {
                 sem1: 16,
@@ -349,7 +378,9 @@
                 sem3: 23,
                 sem4: 24,
                 sem5: 24,
-                sem6: 22
+                sem6: 22,
+                sem7: 15,
+                sem8: 18
             }
         };
 
@@ -360,7 +391,7 @@
             
             if (!branch) {
                 // Clear credits if no branch selected
-                for (let i = 1; i <= 6; i++) {
+                for (let i = 1; i <= 8; i++) {
                     document.getElementById(`credit${i}`).textContent = 'Credits: -';
                 }
                 currentCredits = {};
@@ -369,8 +400,31 @@
 
             // Update credits based on selected branch
             currentCredits = branchCredits[branch];
-            for (let i = 1; i <= 6; i++) {
+            for (let i = 1; i <= 8; i++) {
                 document.getElementById(`credit${i}`).textContent = `Credits: ${currentCredits[`sem${i}`]}`;
+            }
+        }
+
+        function updateVisibleSemesters() {
+            const currentSem = parseInt(document.getElementById('currentSem').value);
+            
+            if (!currentSem) {
+                // Hide all semester inputs if no selection
+                for (let i = 1; i <= 8; i++) {
+                    const container = document.getElementById(`sem${i}-container`);
+                    if (container) {
+                        container.style.display = 'none';
+                    }
+                }
+                return;
+            }
+
+            // Show semesters up to current semester
+            for (let i = 1; i <= 8; i++) {
+                const container = i <= 6 ? document.querySelector(`#sem${i}`).closest('.semester-input') : document.getElementById(`sem${i}-container`);
+                if (container) {
+                    container.style.display = i <= currentSem ? 'block' : 'none';
+                }
             }
         }
 
@@ -385,6 +439,14 @@
                 errorDiv.classList.add('show');
                 return;
             }
+
+            // Check if current semester is selected
+            const currentSem = parseInt(document.getElementById('currentSem').value);
+            if (!currentSem) {
+                errorDiv.textContent = 'Please select your current semester';
+                errorDiv.classList.add('show');
+                return;
+            }
             
             // Get SGPA values
             const sgpa = {
@@ -393,7 +455,9 @@
                 sem3: parseFloat(document.getElementById('sem3').value),
                 sem4: parseFloat(document.getElementById('sem4').value),
                 sem5: parseFloat(document.getElementById('sem5').value),
-                sem6: parseFloat(document.getElementById('sem6').value)
+                sem6: parseFloat(document.getElementById('sem6').value),
+                sem7: parseFloat(document.getElementById('sem7').value),
+                sem8: parseFloat(document.getElementById('sem8').value)
             };
 
             // Validation
